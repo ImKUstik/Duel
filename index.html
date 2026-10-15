@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дуэли · История · Кодекс · Легенды</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#faf7f2;color:#1e1e1e;line-height:1.7;font-size:16px;overflow-x:hidden;background-image:radial-gradient(rgba(0,0,0,.02) 1px,transparent 1px);background-size:24px 24px;-webkit-font-smoothing:antialiased}
+
+.reading-progress{position:fixed;top:0;left:0;right:0;height:4px;background:rgba(217,206,192,.3);z-index:200}
+.reading-progress-fill{height:100%;background:linear-gradient(90deg,#b87c4b,#d9a87a,#b87c4b);width:0%;transition:width .1s linear}
+
+/* ===== КНОПКА-ЦИЛИНДР СПРАВА СВЕРХУ ===== */
+.cylinder-btn{
+  position:fixed;top:18px;right:18px;z-index:1002;
+  width:46px;height:46px;border-radius:50%;
+  background:linear-gradient(145deg,#e8dcc8,#c9b89a);
+  border:2px solid rgba(255,255,255,.7);
+  box-shadow:0 6px 18px rgba(0,0,0,.18), inset 0 2px 4px rgba(255,255,255,.6), inset 0 -3px 6px rgba(0,0,0,.15);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  opacity:.45;transition:all .3s ease;
+  font-size:1.2rem;
+}
+.cylinder-btn::before{
+  content:'';position:absolute;inset:6px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.8), transparent 60%);
+  pointer-events:none;
+}
+.cylinder-btn:hover{opacity:1;transform:scale(1.12) rotate(8deg);box-shadow:0 10px 26px rgba(0,0,0,.28), inset 0 2px 4px rgba(255,255,255,.8)}
+.cylinder-btn.open{opacity:1;transform:rotate(90deg)}
+.cylinder-btn span{position:relative;z-index:2;line-height:1}
+
+/* ===== ВЫДВИЖНАЯ ПАНЕЛЬ СПРАВА ===== */
+.side-panel{
+  position:fixed;top:0;right:0;
+  width:min(520px, 92vw);height:100vh;
+  background:#fff;
+  border-left:1px solid #efe9e2;
+  box-shadow:-20px 0 60px rgba(0,0,0,.18);
+  z-index:1001;
+  transform:translateX(100%);
+  transition:transform .45s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;
+  padding:70px 2.5rem 3rem;
+}
+.side-panel.open{transform:translateX(0)}
+.side-panel::-webkit-scrollbar{width:8px}
+.side-panel::-webkit-scrollbar-track{background:#faf7f2}
+.side-panel::-webkit-scrollbar-thumb{background:#d9cec0;border-radius:4px}
+.side-panel::-webkit-scrollbar-thumb:hover{background:#b87c4b}
+
+.panel-close{
+  position:absolute;top:18px;right:18px;
+  width:40px;height:40px;border-radius:50%;
+  background:#faf6f0;border:1px solid #f0e8df;
+  color:#5f4e3c;font-size:1.1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.panel-close:hover{background:#c0392b;color:#fff;border-color:#c0392b;transform:rotate(90deg)}
+
+.panel-header{text-align:center;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:2px dashed #e2d9d0}
+.panel-header .school{font-weight:600;font-size:.8rem;letter-spacing:.28em;text-transform:uppercase;color:#9b8b7a;margin-bottom:.8rem}
+.panel-header h2{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(1.6rem,4vw,2.2rem);color:#1e1e1e;line-height:1.15;letter-spacing:-.02em;margin-bottom:.5rem}
+.panel-header h2 em{font-style:italic;color:#c0392b;text-decoration:underline;text-decoration-thickness:4px;text-decoration-color:#f0d9d0;text-underline-offset:8px}
+.panel-header .subtitle{font-family:'Playfair Display',serif;font-style:italic;font-size:1.05rem;color:#5f4e3c}
+
+.panel-artwork{border-radius:18px;overflow:hidden;box-shadow:0 16px 36px -14px rgba(0,0,0,.3);border:6px solid #fff;margin-bottom:1.8rem;background:#000}
+.panel-artwork img{width:100%;display:block}
+
+.panel-section{background:#f7f2ec;border-radius:20px;padding:1.8rem 1.6rem;margin-bottom:1.2rem;border:1px solid #ffffff80}
+.panel-section h3{font-family:'Playfair Display',serif;font-weight:700;color:#1e1e1e;font-size:1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:.8rem;line-height:1.3}
+.panel-section h3 .num{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:linear-gradient(135deg,#c0392b,#8b1a1a);color:#fff;border-radius:50%;font-size:.7em;flex-shrink:0;font-weight:800;font-family:'Playfair Display',serif;box-shadow:0 4px 12px rgba(192,57,43,.35)}
+.panel-section p{font-size:.98rem;color:#2e2e2e;line-height:1.8;margin-bottom:.8rem;font-weight:400}
+.panel-section p b{color:#b87c4b;font-weight:700}
+.panel-section p:last-child{margin-bottom:0}
+
+.panel-quote{background:linear-gradient(135deg,#faf6f0,#f5ede4);border-radius:18px;padding:1.8rem 1.5rem;margin-top:1.2rem;border-left:4px solid #c0392b;font-family:'Playfair Display',serif;font-style:italic;font-size:1.05rem;color:#3a322b;line-height:1.7;text-align:center;position:relative}
+.panel-quote::before{content:'"';position:absolute;top:-.8rem;left:.8rem;font-size:3.5rem;color:#e6d5c2;font-family:'Playfair Display',serif;line-height:1;opacity:.75}
+.panel-quote-author{text-align:center;font-family:'Playfair Display',serif;font-style:italic;font-size:1rem;color:#c0392b;margin-top:.5rem}
+
+/* Затемнение фона */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(30,20,10,.35);
+  backdrop-filter:blur(2px);
+  z-index:1000;
+  opacity:0;visibility:hidden;
+  transition:all .4s ease;
+}
+.overlay.open{opacity:1;visibility:visible}
+
+.main-content{padding:0 2rem 90px;transition:margin-left .35s cubic-bezier(.4,0,.2,1)}
+.wrapper{max-width:960px;margin:0 auto;position:relative;z-index:10}
+.card{background:#fff;border-radius:48px;box-shadow:0 30px 50px -20px rgba(0,0,0,.15);padding:4rem 3.5rem;margin-top:40px}
+
+.slider{position:relative;width:100%;border-radius:32px;overflow:hidden;margin-bottom:2.5rem;box-shadow:0 20px 45px -18px rgba(0,0,0,.25);border:1px solid #f0e8df;background:linear-gradient(135deg,#f7f2ec,#e8dcc8);aspect-ratio:16/9}
+.slider-track{position:relative;width:100%;height:100%}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity 1s ease, transform 1.2s ease;transform:scale(1.05);pointer-events:none}
+.slide.active{opacity:1;transform:scale(1);pointer-events:auto}
+.slide img{width:100%;height:100%;object-fit:cover;display:block}
+.slide-caption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.78));padding:3rem 2.2rem 1.8rem;color:#fff;font-family:'Playfair Display',serif;font-size:clamp(1.1rem,2.5vw,1.5rem);line-height:1.35;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.slide-caption b{display:block;font-weight:700;font-size:.75em;text-transform:uppercase;letter-spacing:.22em;color:#ffd700;margin-bottom:.6rem}
+.slider-dots{position:absolute;bottom:16px;right:20px;display:flex;gap:10px;z-index:5}
+.slider-dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.5);border:2px solid rgba(255,255,255,.9);cursor:pointer;transition:all .3s;padding:0}
+.slider-dot:hover{background:rgba(255,255,255,.8)}
+.slider-dot.active{background:#c0392b;border-color:#fff;transform:scale(1.25)}
+
+.report-header{text-align:center;margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:2px dashed #e2d9d0}
+.report-header .school{font-weight:600;font-size:.85rem;letter-spacing:.28em;text-transform:uppercase;color:#9b8b7a;margin-bottom:1.2rem}
+.report-header h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2rem,5vw,3.2rem);color:#1e1e1e;line-height:1.12;letter-spacing:-.025em;margin-bottom:.8rem}
+.report-header h1 em{font-style:italic;color:#c0392b;text-decoration:underline;text-decoration-thickness:5px;text-decoration-color:#f0d9d0;text-underline-offset:12px}
+.report-header .subtitle{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(1.15rem,2.8vw,1.55rem);color:#5f4e3c;display:inline-block;padding-left:1.1rem;border-left:4px solid #c0392b;line-height:1.5}
+
+.report-section{background:#f7f2ec;border-radius:28px;padding:2.5rem;margin-bottom:1.8rem;border:1px solid #ffffff80}
+.report-section h2{font-family:'Playfair Display',serif;font-weight:700;color:#1e1e1e;font-size:clamp(1.4rem,3.8vw,1.85rem);margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;line-height:1.25;letter-spacing:-.015em}
+.report-section h2 .num{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;background:linear-gradient(135deg,#c0392b,#8b1a1a);color:#fff;border-radius:50%;font-size:.72em;flex-shrink:0;font-weight:800;font-family:'Playfair Display',serif;box-shadow:0 6px 16px rgba(192,57,43,.35)}
+.report-section h3{font-family:'Playfair Display',serif;font-weight:700;color:#b87c4b;font-size:clamp(1.1rem,2.9vw,1.3rem);margin:1.6rem 0 .9rem;letter-spacing:-.01em}
+.report-section h3:first-of-type{margin-top:0}
+.report-section p{font-size:clamp(1rem,2.4vw,1.1rem);color:#2e2e2e;line-height:1.85;margin-bottom:1rem;font-weight:400}
+.report-section p b{color:#b87c4b;font-weight:700}
+.report-section p:last-child{margin-bottom:0}
+
+.quote{background:linear-gradient(135deg,#faf6f0,#f5ede4);border-radius:24px;padding:2.6rem 2.2rem;margin:1.5rem 0 0;border-left:5px solid #c0392b;font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(1.1rem,2.5vw,1.35rem);color:#3a322b;line-height:1.7;text-align:center;position:relative}
+.quote::before{content:'"';position:absolute;top:-1.3rem;left:1rem;font-size:5rem;color:#e6d5c2;font-family:'Playfair Display',serif;line-height:1;opacity:.75}
+.quote::after{content:'"';position:absolute;bottom:-2.6rem;right:1rem;font-size:5rem;color:#e6d5c2;font-family:'Playfair Display',serif;line-height:1;opacity:.75}
+.quote-author{text-align:center;font-family:'Playfair Display',serif;font-style:italic;font-size:1.25rem;color:#c0392b;margin-top:.7rem}
+
+.features-list{list-style:none;margin-top:1rem}
+.features-list li{position:relative;padding:.6rem 0 .6rem 1.5rem;font-size:clamp(1rem,2.3vw,1.08rem);color:#2e2e2e;line-height:1.7;font-weight:400;border-bottom:1px solid #efe9e2}
+.features-list li:last-child{border-bottom:none}
+.features-list li::before{content:'•';position:absolute;left:0;top:.5rem;color:#b8975a;font-weight:800;font-size:1.3em}
+
+.duel-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1rem}
+.duel-item{background:#fff;border-radius:18px;padding:1.5rem 1.6rem;border:1px solid #f0e8df;display:flex;gap:16px;align-items:flex-start;transition:all .25s}
+.duel-item:hover{transform:translateY(-4px);box-shadow:0 14px 28px -12px rgba(0,0,0,.12)}
+.duel-num{font-family:'Playfair Display',serif;font-weight:900;font-size:1.6rem;color:#c0392b;line-height:1;flex-shrink:0;width:44px;letter-spacing:-.02em}
+.duel-content h4{font-family:'Playfair Display',serif;font-weight:700;font-size:1.15rem;color:#1e1e1e;margin-bottom:7px;line-height:1.3;letter-spacing:-.01em}
+.duel-content p{font-size:.98rem;color:#4b5563;line-height:1.65;font-weight:400;margin:0}
+
+.footer-note{margin-top:2.5rem;padding-top:1.8rem;border-top:1px solid #efe9e2;font-size:.88rem;color:#a79788;text-align:center}
+
+@media(max-width:768px){
+  .main-content{padding:0 1.1rem 70px}
+  .card{padding:2.2rem 1.5rem;border-radius:36px}
+  .report-section{padding:1.8rem 1.4rem;border-radius:24px}
+  .report-header h1{font-size:1.8rem}
+  .duel-grid{grid-template-columns:1fr}
+  .slide-caption{padding:1.8rem 1.3rem 1.2rem;font-size:1rem}
+  .cylinder-btn{top:12px;right:12px;width:40px;height:40px}
+  .side-panel{padding:60px 1.5rem 2rem}
+}
+@media(max-width:480px){
+  body{font-size:15px}
+  .card{padding:1.6rem 1.2rem;border-radius:28px}
+  .duel-num{font-size:1.3rem;width:36px}
+}
+</style>
+</head>
+<body>
+
+<div class="reading-progress"><div class="reading-progress-fill" id="readingProgress"></div></div>
+
+<!-- ЗАТЕМНЕНИЕ ФОНА -->
+<div class="overlay" id="overlay"></div>
+
+<!-- КНОПКА-ЦИЛИНДР -->
+<button class="cylinder-btn" id="cylinderBtn" title="Дуэль Пушкина">
+  <span>⚔️</span>
+</button>
+
+<!-- ВЫДВИЖНАЯ ПАНЕЛЬ СПРАВА -->
+<aside class="side-panel" id="sidePanel">
+  <button class="panel-close" id="panelClose" title="Закрыть">✕</button>
+
+  <div class="panel-header">
+    <div class="school">История · последняя дуэль</div>
+    <h2>Дуэль <em>Пушкина</em></h2>
+    <div class="subtitle">27 января 1837 года · Чёрная речка</div>
+  </div>
+
+  <div class="panel-artwork">
+    <img src="https://ug.ru/wp-content/uploads/2026/02/duel.jpg" alt="Дуэль Пушкина">
+  </div>
+
+  <div class="panel-section">
+    <h3><span class="num">1</span>Причины дуэли</h3>
+    <p>В ноябре 1836 года Пушкин получил <b>анонимное письмо</b> — так называемый «диплом рогоносца», содержащий прозрачные намёки на неверность его жены Натальи Николаевны. Подозрения пали на <b>Жоржа Дантеса</b>, французского офицера на русской службе, который открыто ухаживал за Натальей Николаевной.</p>
+    <p>Пушкин вызвал Дантеса на дуэль, но она не состоялась: Дантес неожиданно сделал предложение сестре Натальи Николаевны — Екатерине Гончаровой, и свадьба состоялась 10 января 1837 года. Однако светские сплетни и «мерзкое поведение» Дантеса после женитьбы не прекратились.</p>
+  </div>
+
+  <div class="panel-section">
+    <h3><span class="num">2</span>Вызов</h3>
+    <p>26 января 1837 года Пушкин написал <b>исключительно резкое письмо</b> приёмному отцу Дантеса — барону Геккерну, обвиняя его в сводничестве, а Дантеса — в трусости и низости. Это письмо фактически являлось вызовом.</p>
+    <p>Секундантом Пушкина стал его лицейский товарищ <b>Константин Данзас</b>. Местом встречи была выбрана окрестность Чёрной речки под Петербургом.</p>
+  </div>
+
+  <div class="panel-section">
+    <h3><span class="num">3</span>Условия поединка</h3>
+    <p>Условия дуэли были <b>смертельными</b> — они не оставляли шансов обоим противникам. Дуэлянты стояли в <b>двадцати шагах</b> друг от друга, с барьером в десять шагов. Стрелять разрешалось с любого расстояния от барьера.</p>
+    <p>Оружием служили пистолеты. В отличие от европейской практики, где обычно стреляли с 25–30 шагов, здесь дистанция была предельно сокращена.</p>
+  </div>
+
+  <div class="panel-section">
+    <h3><span class="num">4</span>Ход поединка</h3>
+    <p>Первый выстрел сделал Дантес. Пуля попала Пушкину в <b>живот</b> — рана оказалась смертельной. Поэт упал в снег, но нашёл силы произвести ответный выстрел лёжа. Его пуля лишь <b>слегка ранила Дантеса в правую руку</b>.</p>
+    <p>Секунданты увезли Пушкина домой на санях. «<i>Это конец. Я должен идти. Я едва дышу. Мне душно</i>», — говорил поэт друзьям. Врачи не оставили ему надежды.</p>
+  </div>
+
+  <div class="panel-section">
+    <h3><span class="num">5</span>Смерть и последствия</h3>
+    <p>Александр Сергеевич Пушкин скончался <b>29 января 1837 года</b>, через два дня после дуэли.</p>
+    <p>По законам Российской империи дуэли были запрещены. Военный суд приговорил Дантеса и секундантов к <b>повешению</b> (Пушкина — посмертно, «за ноги»), но император Николай I смягчил приговор. Дантес был <b>выслан из России</b> и лишён офицерского звания. Секундант Пушкина Данзас отсидел <b>два месяца в крепости</b>.</p>
+    <p>Царь взял на себя заботы о семье поэта: оплатил долги, назначил пенсию вдове и дочерям, определил сыновей в пажи.</p>
+  </div>
+
+  <div class="panel-quote">
+    Погиб поэт! — невольник чести —<br>Пал, оклеветанный молвой.
+  </div>
+  <div class="panel-quote-author">— М. Ю. Лермонтов, «Смерть поэта»</div>
+
+</aside>
+
+<div class="main-content">
+<div class="wrapper">
+<div class="card">
+
+  <div class="slider" id="slider">
+    <div class="slider-track">
+      <div class="slide active">
+        <img src="https://avatars.mds.yandex.net/i?id=b3245018f39a9294ef5f1dfae8492b6d0c0e12f5-5288148-images-thumbs&n=13" alt="Дуэль">
+        <div class="slide-caption">
+          <b>Дуэли</b>
+          <span>История, кодекс и легенды поединков чести</span>
+        </div>
+      </div>
+      <div class="slide">
+        <img src="https://cdn.culture.ru/images/cb535088-edc6-5393-8ff3-5f9457721c3b" alt="Дуэль на шпагах">
+        <div class="slide-caption">
+          <b>Поединок</b>
+          <span>Шпаги, пистолеты и правила выбора оружия</span>
+        </div>
+      </div>
+      <div class="slide">
+        <img src="https://ug.ru/wp-content/uploads/2026/02/duel.jpg" alt="Дуэль Пушкина">
+        <div class="slide-caption">
+          <b>Пушкин</b>
+          <span>Последняя дуэль поэта — нажмите на кнопку справа вверху</span>
+        </div>
+      </div>
+    </div>
+    <div class="slider-dots">
+      <button class="slider-dot active" aria-label="Slide 1"></button>
+      <button class="slider-dot" aria-label="Slide 2"></button>
+      <button class="slider-dot" aria-label="Slide 3"></button>
+    </div>
+  </div>
+
+  <div class="report-header">
+    <div class="school">Дуэли · история · кодекс · легенды</div>
+    <h1>Дуэли,<br>честь и <em>оружие</em></h1>
+    <div class="subtitle">от средневековья до XIX века · поединки чести</div>
+  </div>
+
+  <section class="report-section">
+    <h2><span class="num">1</span><span>Что такое дуэль</span></h2>
+    <p><b>Дуэль</b> — это регламентированный поединок между двумя людьми, проводимый по определённым правилам, с целью защитить честь и достоинство. В отличие от простого убийства или драки, дуэль всегда предполагала формальный вызов, согласованные условия и присутствие секундантов.</p>
+    <p>Расцвет дуэлей пришёлся на XVI–XIX века, особенно во Франции, Германии, России и Италии. Дуэльный кодекс был неписаным, но строгим: он определял, кто имеет право вызвать, как выбрать оружие, как вести себя на поединке и как завершить конфликт.</p>
+  </section>
+
+  <section class="report-section">
+    <h2><span class="num">2</span><span>Как появились дуэли</span></h2>
+    <p>Истоки дуэлей уходят в <b>средневековые судебные поединки</b> — «суд Божий», когда исход спора решался в бою. Считалось, что Бог дарует победу правому. Постепенно церковь и королевская власть пытались запретить такие поединки, но традиция сохранилась в дворянской среде.</p>
+    <p>В эпоху Возрождения, с развитием кодекса чести, дуэль превратилась в способ личной защиты достоинства. Особенно популярной она стала во Франции при Людовике XIII и Людовике XIV, а затем распространилась по всей Европе. В России дуэли получили широкое распространение в XVIII–XIX веках, несмотря на запреты и суровые наказания.</p>
+  </section>
+
+  <section class="report-section">
+    <h2><span class="num">3</span><span>Кодекс дуэли</span></h2>
+    <h3>Основные правила</h3>
+    <ul class="features-list">
+      <li>Вызов делался письменно или через секундантов.</li>
+      <li>Оскорблённая сторона имела право выбрать оружие.</li>
+      <li>Секунданты договаривались о месте, времени и условиях.</li>
+      <li>Поединок проводился в присутствии врача.</li>
+      <li>Существовали разные виды дуэлей: до первой крови, до тяжёлой раны, до смерти.</li>
+      <li>Отказ от дуэли считался трусостью и вёл к общественному осуждению.</li>
+    </ul>
+    <h3>Секунданты</h3>
+    <p>Секунданты играли ключевую роль: они представляли интересы дуэлянтов, следили за соблюдением правил, пытались примирить стороны до поединка и фиксировали результат. Их честность и беспристрастность гарантировали законность дуэли.</p>
+  </section>
+
+  <section class="report-section">
+    <h2><span class="num">4</span><span>Самое популярное оружие</span></h2>
+    <div class="duel-grid">
+      <div class="duel-item"><div class="duel-num">01</div><div class="duel-content"><h4>Шпага и рапира</h4><p>Классическое оружие дворянских дуэлей. Требовала мастерства, скорости и точности. Часто использовалась во Франции и Италии.</p></div></div>
+      <div class="duel-item"><div class="duel-num">02</div><div class="duel-content"><h4>Пистолет</h4><p>С конца XVIII века пистолеты вытеснили холодное оружие. Дуэли на пистолетах были более смертоносными и часто заканчивались трагически.</p></div></div>
+      <div class="duel-item"><div class="duel-num">03</div><div class="duel-content"><h4>Сабли</h4><p>Использовались в кавалерийских и военных дуэлях. Более тяжёлое оружие, чем шпага, наносило серьёзные раны.</p></div></div>
+      <div class="duel-item"><div class="duel-num">04</div><div class="duel-content"><h4>Кинжалы</h4><p>Редкий выбор, но встречался в ближнем бою. Использовались в особых случаях, когда дуэлянты хотели максимально сократить дистанцию.</p></div></div>
+    </div>
+  </section>
+
+  <section class="report-section">
+    <h2><span class="num">5</span><span>Самые известные дуэли</span></h2>
+    <ul class="features-list">
+      <li><b>Пушкин и Дантес (1837)</b> — смертельная дуэль, в которой Александр Пушкин был смертельно ранен.</li>
+      <li><b>Лермонтов и Мартынов (1841)</b> — дуэль, закончившаяся гибелью Михаила Лермонтова.</li>
+      <li><b>Гамильтон и Бёрр (1804)</b> — американская дуэль, в которой погиб Александр Гамильтон.</li>
+      <li><b>Дуэль Клейста и Фосса</b> — немецкая дуэль, закончившаяся смертью обоих участников.</li>
+      <li><b>Дуэли Д'Артаньяна</b> — литературный образ, вдохновлённый реальными дуэлями гасконских дворян.</li>
+    </ul>
+  </section>
+
+  <section class="report-section">
+    <div class="quote">Честь дороже жизни,<br>но дуэль — это не убийство, а защита достоинства.</div>
+    <div class="quote-author">— Из дуэльного кодекса</div>
+  </section>
+
+  <div class="footer-note">
+    Дуэли · история · кодекс · легенды · поединки чести
+  </div>
+
+</div>
+</div>
+</div>
+
+<script>
+// ==================== СЛАЙДЕР ====================
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+const dots = document.querySelectorAll('.slider-dot');
+let sliderInterval = null;
+
+function goToSlide(n){
+  slides.forEach((s, i) => s.classList.toggle('active', i === n));
+  dots.forEach((d, i) => d.classList.toggle('active', i === n));
+  currentSlide = n;
+}
+function nextSlide(){ goToSlide((currentSlide + 1) % slides.length); }
+function startAutoplay(){ clearInterval(sliderInterval); sliderInterval = setInterval(nextSlide, 4000); }
+function stopAutoplay(){ clearInterval(sliderInterval); }
+
+if(slides.length > 0){
+  startAutoplay();
+  const sliderEl = document.getElementById('slider');
+  if(sliderEl){
+    sliderEl.addEventListener('mouseenter', stopAutoplay);
+    sliderEl.addEventListener('mouseleave', startAutoplay);
+  }
+}
+document.querySelectorAll('.slider-dot').forEach((dot, i) => {
+  dot.addEventListener('click', () => { goToSlide(i); startAutoplay(); });
+});
+
+// ==================== ВЫДВИЖНАЯ ПАНЕЛЬ ====================
+const cylinderBtn = document.getElementById('cylinderBtn');
+const sidePanel = document.getElementById('sidePanel');
+const overlay = document.getElementById('overlay');
+const panelClose = document.getElementById('panelClose');
+
+function openPanel(){
+  sidePanel.classList.add('open');
+  overlay.classList.add('open');
+  cylinderBtn.classList.add('open');
+  cylinderBtn.querySelector('span').textContent = '✕';
+  document.body.style.overflow = 'hidden';
+}
+
+function closePanel(){
+  sidePanel.classList.remove('open');
+  overlay.classList.remove('open');
+  cylinderBtn.classList.remove('open');
+  cylinderBtn.querySelector('span').textContent = '⚔️';
+  document.body.style.overflow = '';
+}
+
+cylinderBtn.addEventListener('click', () => {
+  if(sidePanel.classList.contains('open')) closePanel();
+  else openPanel();
+});
+
+panelClose.addEventListener('click', closePanel);
+overlay.addEventListener('click', closePanel);
+
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && sidePanel.classList.contains('open')) closePanel();
+});
+
+// ==================== ПРОГРЕСС ====================
+const readingProgress = document.getElementById('readingProgress');
+
+function updateProgress(){
+  const st = window.scrollY || document.documentElement.scrollTop;
+  const sh = document.documentElement.scrollHeight - window.innerHeight;
+  const p = sh > 0 ? (st / sh) * 100 : 0;
+  readingProgress.style.width = p + '%';
+}
+window.addEventListener('scroll', updateProgress);
+window.addEventListener('load', updateProgress);
+window.addEventListener('resize', updateProgress);
+</script>
+</body>
+</html>
